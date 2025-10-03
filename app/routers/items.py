@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.post("/items/", response_model=ItemSchema)
 async def create_item(item: ItemCreate, db: AsyncSession = Depends(get_db), current_user = Depends(get_current_user)):
-    db_item = ItemModel(**item.dict(), owner_id=current_user.id)
+    db_item = ItemModel(**item.model_dump(), owner_id=current_user.id)
     db.add(db_item)
     await db.commit()
     await db.refresh(db_item)
@@ -41,7 +41,7 @@ async def update_item(item_id: int, item: ItemCreate, db: AsyncSession = Depends
         raise HTTPException(status_code=404, detail="Item not found")
     if db_item.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized")
-    for key, value in item.dict().items():
+    for key, value in item.model_dump().items():
         setattr(db_item, key, value)
     await db.commit()
     await db.refresh(db_item)

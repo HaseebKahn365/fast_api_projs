@@ -62,6 +62,6 @@ def test_download_nonexistent_file(client):
 
     # Try to download nonexistent file
     response = client.get("/files/download/nonexistent.txt", headers=headers)
-    assert response.status_code == 200  # The code returns 200 with error message, but should be 404
+    assert response.status_code == 404  # Corrected to match the implementation
     data = response.json()
-    assert "error" in data
+    assert "detail" in data and data["detail"] == "File not found"

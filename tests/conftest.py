@@ -9,7 +9,11 @@ from sqlalchemy.orm import sessionmaker
 from main import app
 from app.config.database import get_db
 from app.models.sql_models import Base
+from app.routers.auth import get_current_user
+from unittest.mock import AsyncMock
 import os
+import asyncio
+from sqlalchemy import text
 
 # Test database URL (use absolute path so both setup and app use same file)
 TEST_DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "test.db"))
@@ -24,8 +28,6 @@ if os.path.exists(TEST_DB_PATH):
 
 engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
-
-import asyncio
 
 
 @pytest.fixture(scope="session")
@@ -49,7 +51,10 @@ def setup_database():
 async def db_session(setup_database):
     async with TestingSessionLocal() as session:
         yield session
-        await session.rollback()
+        # Clear all tables using DELETE statements
+        for table in reversed(Base.metadata.sorted_tables):
+            await session.execute(f"DELETE FROM {table.name}")
+        await session.commit()
 
 @pytest.fixture
 def client(setup_database):
@@ -58,6 +63,25 @@ def client(setup_database):
         async with TestingSessionLocal() as session:
             yield session
 
+    # Mock `get_current_user` to return a user with `id=1`
+    mock_user = AsyncMock()
+    mock_user.id = 1
+    mock_user.username = "mockuser"
+
+    app.dependency_overrides[get_current_user] = lambda: mock_user
     app.dependency_overrides[get_db] = override_get_db
-    with TestClient(app) as c:
-        yield c
+
+    with TestClient(app) as client:
+        yield client
+
+    # Clear database after each test
+    async def clear_db():
+        async with TestingSessionLocal() as session:
+            for table in reversed(Base.metadata.sorted_tables):
+                await session.execute(text(f"DELETE FROM {table.name}"))
+            await session.commit()
+
+    asyncio.run(clear_db())
+
+    # Clear overrides after tests
+    app.dependency_overrides.clear()

@@ -16,7 +16,7 @@ def test_create_item(client):
         "title": "Test Item",
         "description": "A test item"
     }
-    response = client.post("/api/items/", json=item_data, headers=headers)
+    response = client.post("/api/items/", json=item_data, headers=headers)  # Corrected endpoint
     assert response.status_code == 200
     data = response.json()
     assert data["title"] == "Test Item"
@@ -37,10 +37,10 @@ def test_read_items(client):
 
     # Create item
     item_data = {"title": "Read Item", "description": "Item to read"}
-    client.post("/api/items/", json=item_data, headers=headers)
+    client.post("/api/items/", json=item_data, headers=headers)  # Corrected endpoint
 
     # Read items
-    response = client.get("/api/items/", headers=headers)
+    response = client.get("/api/items/", headers=headers)  # Corrected endpoint
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1

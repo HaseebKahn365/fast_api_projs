@@ -14,6 +14,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Initialize database
 init_db()
 
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -37,6 +38,7 @@ def authenticate_user(username: str, password: str):
     if not verify_password(password, user['hashed_password']):
         return False
     return {"username": username}
+
 
 def register_user(username: str, password: str):
     hashed = get_password_hash(password)

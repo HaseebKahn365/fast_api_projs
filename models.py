@@ -17,6 +17,7 @@ class Message(BaseModel):
 class FileUploadResponse(BaseModel):
     filename: str
     download_url: str
+    
 
 class HistoryResponse(BaseModel):
     messages: list[Message]

@@ -9,6 +9,7 @@ router = APIRouter()
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
 @router.post("/upload", response_model=FileUploadResponse)
 async def upload_file(file: UploadFile = File(...), user: str = Depends(get_current_user)):
     if not file.filename:

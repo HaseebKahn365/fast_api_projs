@@ -15,6 +15,7 @@ class UserRegister(BaseModel):
     username: str
     password: str
 
+
 @app.post("/register", tags=["Auth"])
 async def register(user: UserRegister):
     register_user(user.username, user.password)

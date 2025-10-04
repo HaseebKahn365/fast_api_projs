@@ -28,6 +28,7 @@ async def get_current_user_ws(websocket: WebSocket):
         return None
     return username
 
+
 @router.websocket("/ws/chat")
 async def websocket_endpoint(websocket: WebSocket):
     user = await get_current_user_ws(websocket)

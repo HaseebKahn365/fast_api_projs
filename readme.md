@@ -35,6 +35,7 @@ I implement the following tasks, primarily located in new routers (`ws.py`, `fil
 
 ---
 
+
 ### ⚙️ Demo & Testing Strategy
 
 Testing this project requires validating both $\text{HTTP}$ and $\text{WebSocket}$ protocols. The app runs on `http://127.0.0.1:8001` with data stored in `chat_app.db`.
